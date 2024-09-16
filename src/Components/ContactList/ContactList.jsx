@@ -1,12 +1,12 @@
 import Contact from "../Contact/Contact";
+import c from "./ContactList.module.css";
 
 const ContactList = ({ contactList, setContacts }) => {
   const handleDeleteContact = (id) => {
-    console.log(id);
-    setContacts((prev) => prev.filter((item) => item.id !== id));
+    setContacts((prev) => prev.filter((contact) => contact.id !== id));
   };
   return (
-    <div>
+    <div className={c.contactList}>
       {contactList.map((contact) => (
         <Contact
           key={contact.id}

@@ -1,64 +1,50 @@
-import { Field, Form, Formik } from "formik";
-// import { useState } from "react";
+import { ErrorMessage, Field, Form, Formik } from "formik";
+import { nanoid } from "nanoid";
+import * as Yup from "yup";
+import s from "./ContactForm.module.css";
 
-const ContactForm = () => {
+const ContactForm = ({ addContact }) => {
   const initialValues = {
-    username: "",
+    name: "",
     number: "",
   };
-  // const [formData, setFormData] = useState({
-  //   username: "",
-  //   number: "",
-  // });
-  // const [newContact, setNewContact] = useState('');
 
-  const handleSubmit = (values, actions) => {
-    console.log(values);
-    actions.resetForm();
+  const handleSubmit = (values, { resetForm }) => {
+    addContact({ ...values, id: nanoid() });
+    resetForm();
   };
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   setFormData({
-  //     username: "",
-  //     number: "",
-  //   });
-  // };
-  const handleChangeInput = (e) => {
-    const { name, value } = e.target;
-    value((prev) => {
-      return {
-        ...prev,
-        [name]: value,
-      };
-    });
-  };
+
+  const validationSchema = Yup.object().shape({
+    name: Yup.string()
+      .min(3, "Name must be at least 3 characters")
+      .max(50, "Name must be less than 50 characters")
+      .required("Name is required"),
+    number: Yup.string()
+      .min(5, "Number should be at least 5 characters")
+      .required("Phone number is required")
+      .matches(
+        /^[0-9]{3}-[0-9]{2}-[0-9]{2}$/,
+        "Phone number is not valid, use xxx-xx-xx format"
+      ),
+  });
 
   return (
-    <div>
+    <div className={s.formWrapper}>
       <Formik
         initialValues={initialValues}
-        onSubmit={() => {
-          handleSubmit;
-        }}
+        onSubmit={handleSubmit}
+        validationSchema={validationSchema}
       >
-        <Form>
-          <label>
+        <Form className={s.form}>
+          <label className={s.label}>
             <span>Name</span>
-            <Field
-              value={initialValues.username}
-              onChange={handleChangeInput}
-              name="username"
-              type="name"
-            />
+            <Field name="name" type="text" className={s.input} />
+            <ErrorMessage name="name" component="div" />
           </label>
-          <label>
+          <label className={s.label}>
             <span>Number</span>
-            <Field
-              value={initialValues.number}
-              onChange={handleChangeInput}
-              name="number"
-              // type="number"
-            />
+            <Field name="number" type="tel" className={s.input} />
+            <ErrorMessage name="number" component="div" />
           </label>
           <button type="submit">Add contact</button>
         </Form>
